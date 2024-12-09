@@ -1,0 +1,66 @@
+PROBLEM : Add a user to the linux system and give only the access to a particular file only ?
+Answer : 
+sudo useradd -m chaitanya           # To add a user chaitanya
+sudo passwd chaitanya               # set the password: new@2803NCD for the user
+sudo nano /etc/ssh/sshd_config      : set PasswordAuthentication yes
+sudo systemctl restart sshd.
+sudo groupadd dev                   # create a dev group
+getent group dev                    # check if the group was created
+sudo usermod -aG dev chaitanya      # Add Chaitanya to the "dev" Group. -aG: Adds the user to the group without removing existing groups.
+sudo usermod -g dev chaitanya       #  Add Chaitanya to the "dev" Group. -g: Sets the primary group for the user.
+id chaitanya                        # Chaitanya is now part of the dev group, 
+groups chaitanya                    # list all the group chaitanya is part of it
+sudo chown :dev filelog             # cahnge the group of the user associated with the filelog
+sudo groupdel chaitanya             # delete the group created
+
+cat /etc/group
+   1.chaitanya:x:1001:
+       Group Name: chaitanya
+       Group Password: x (default, indicating no password)
+       Group ID (GID): 1001
+       Members: No members listed (indicating no users are in this group directly)
+    2.dev:x:1002:chaitanya
+	      Group Name: dev
+        Group Password: x
+        Group ID (GID): 1002
+        Members: chaitanya is a member of the dev group.
+
+ls -la
+-rw-r--r--.  1 chaitanya chaitanya    20 Dec  9 07:33  filelog 
+
+-    : directory
+rw-  : owner permissions  ( Read (r) = 4, Write (w) = 2, Execute (x) = 1 ) 
+-r-  : group permissions  ( Read (r) = 4, Write (w) = 2, Execute (x) = 1 )
+r--  : others permissions ( Read (r) = 4, Write (w) = 2, Execute (x) = 1 )
+
+chaitanya:   The owner of the file.
+chaitanya:   The group associated with the file.
+20:          The size of the file in bytes
+
+
+sudo nano /etc/ssh/sshd_config     : set PasswordAuthentication yes
+                                   : BE CAREFUL WITH PubkeyAuthentication 
+                                   : if PubkeyAuthentication is set no, means u cant login with .pem key 
+
+
+sudo systemctl restart sshd 
+
+ssh chaitanya@ip            
+ . chaitanya can only read and write only filelog(which he is owner) cant do anything in the linux System
+ . if chaitanya put sudo vi anyfilename , he cant write any file in linux system because he should be the member of sudoers file also.
+
+# Giving chaitanya elevated permissions(superuser)
+option 1 : sudo usermod -aG sudo chaitanya
+option 2 : sudo visudo
+           root   ALL=(ALL:ALL) ALL
+           ADD Below: 
+		       chaitanya ALL=(ALL:ALL) ALL
+          # ctrl+o:  save the file
+		       Enter 
+		       ctrl+x: exit from the file.
+
+
+
+
+ 
+ 
